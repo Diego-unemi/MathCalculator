@@ -1,9 +1,8 @@
 import os
 import sys
 import flet as ft
-# Configurar backend de matplotlib antes de cualquier otro import
 import matplotlib
-matplotlib.use('Agg')  # Usar backend no interactivo
+matplotlib.use('Agg')  
 
 # Agregar el directorio raíz al PYTHONPATH
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -21,9 +20,8 @@ def main(page: ft.Page):
         page.bgcolor = "#000000"  # Color negro en formato hexadecimal
         
         # Habilitar scroll para el contenido principal, pero no para toda la aplicación
-        # Esto permite que el sidebar permanezca fijo
-        page.scroll = None        # Sin scroll a nivel de página
-        page.auto_scroll = False  # Desactivar auto-scroll para evitar problemas con el sidebar fijo
+        page.scroll = None        
+        page.auto_scroll = False  
 
         # Inicializar la vista principal
         main_view = MainView(page)
