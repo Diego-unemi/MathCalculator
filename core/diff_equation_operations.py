@@ -9,7 +9,6 @@ class DiffEquationOperations:
     
     # MÉTODO ANALÍTICO
     def normalizar_raices(self, expr_str, func_name, indep_var):
-        """Normaliza diferentes notaciones de raíces a formato SymPy."""
         patrones = [
             (fr'sqrt\s*\(\s*{func_name}\s*\)', f'Pow({func_name}({indep_var}), Rational(1, 2))'),
             (fr'raiz\s*\(\s*{func_name}\s*\)', f'Pow({func_name}({indep_var}), Rational(1, 2))'),
@@ -30,7 +29,6 @@ class DiffEquationOperations:
         return expr_str
 
     def preparar_ecuacion(self, ecuacion_str, func_name, indep_var):
-        """Prepara la ecuación para su resolución."""
         # Eliminar espacios
         ecuacion_str = ecuacion_str.replace(' ', '')
         
@@ -67,7 +65,6 @@ class DiffEquationOperations:
         return ics, y0
 
     def evaluar_solucion(self, sol_candidata, x0, h, y0, x):
-        """Evalúa si una solución candidata es válida."""
         test_points = [x0, x0 + h, x0 + 2*h]
         for test_x in test_points:
             try:
@@ -92,7 +89,6 @@ class DiffEquationOperations:
         return True
 
     def resolver_analitico(self, ecuacion_str: str, condiciones_iniciales: dict, t_total: float, h: float, func_name: str = 'y', indep_var: str = 'x'):
-        """Resuelve una ecuación diferencial ordinaria usando SymPy."""
         try:
             # Configuración inicial
             x = sp.Symbol(indep_var)
@@ -207,7 +203,6 @@ class DiffEquationOperations:
     
     # MÉTODO DE EULER
     def extraer_edo_primer_orden(self, ecuacion_str: str):
-        """Extrae la función f(x,y) de la ecuación dy/dx = f(x,y)."""
         # Eliminar espacios
         ecuacion_str = ecuacion_str.replace(' ', '')
         
@@ -225,7 +220,6 @@ class DiffEquationOperations:
         return rhs, None
     
     def resolver_euler(self, ecuacion_str: str, condiciones_iniciales: dict, t_total: float, h: float):
-        """Resuelve una ecuación diferencial usando el método de Euler."""
         try:
             # Extraer la función f(x,y) de la ecuación
             f_str, error = self.extraer_edo_primer_orden(ecuacion_str)
@@ -260,7 +254,6 @@ class DiffEquationOperations:
     
     # MÉTODO DE RUNGE-KUTTA
     def resolver_runge_kutta(self, ecuacion_str: str, condiciones_iniciales: dict, t_total: float, h: float):
-        """Resuelve una ecuación diferencial usando el método de Runge-Kutta de 4° orden."""
         try:
             # Extraer la función f(x,y) de la ecuación
             f_str, error = self.extraer_edo_primer_orden(ecuacion_str)
@@ -302,7 +295,6 @@ class DiffEquationOperations:
             return None, None, f"Error al resolver con Runge-Kutta: {str(e)}"
 
     def resolver_euler_heun(self, ecuacion_str: str, condiciones_iniciales: dict, t_total: float, h: float):
-        """Resuelve una ecuación diferencial usando el método de Euler mejorado (Heun)."""
         try:
             # Extraer la función f(x,y) de la ecuación
             f_str, error = self.extraer_edo_primer_orden(ecuacion_str)
@@ -343,7 +335,6 @@ class DiffEquationOperations:
             return None, None, f"Error al resolver con Euler-Heun: {str(e)}"
 
     def resolver_taylor_orden2(self, ecuacion_str: str, condiciones_iniciales: dict, t_total: float, h: float):
-        """Resuelve una ecuación diferencial usando el método de Taylor de orden 2."""
         try:
             # Extraer la función f(x,y) de la ecuación
             f_str, error = self.extraer_edo_primer_orden(ecuacion_str)
@@ -376,7 +367,7 @@ class DiffEquationOperations:
                 f_xy = f(x, y)
                 
                 # Aproximación de la segunda derivada usando diferencias finitas
-                h_small = h/100  # Paso pequeño para aproximar la derivada
+                h_small = h/100  
                 f_xy_plus = f(x + h_small, y + h_small * f_xy)
                 f_xy_minus = f(x - h_small, y - h_small * f_xy)
                 f_xy_prime = (f_xy_plus - f_xy_minus) / (2 * h_small)
@@ -390,7 +381,6 @@ class DiffEquationOperations:
             return None, None, f"Error al resolver con Taylor: {str(e)}"
 
     def resolver_minimos_cuadrados(self, ecuacion_str: str, condiciones_iniciales: dict, t_total: float, h: float):
-        """Resuelve una ecuación diferencial usando el método de mínimos cuadrados (regresión lineal)."""
         try:
             # Primero obtener la solución analítica
             t_analitico, y_analitico, _ = self.resolver_analitico(

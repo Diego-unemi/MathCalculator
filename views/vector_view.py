@@ -10,275 +10,168 @@ class VectorView:
         self.dimensions = ["2D", "3D"]
         self.current_dimension = "3D"
         
-    def show(self):
-        # Título de la página
-        title = ft.Text(
-            "Vector Calculator",
-            size=24,
-            weight=ft.FontWeight.BOLD,
-            color=ft.Colors.WHITE,
-        )
-        
-        # Selector de dimensiones
-        dimension_selector = ft.Dropdown(
-            width=100,
-            text_size=16,
-            value=self.current_dimension,
-            options=[
-                ft.dropdown.Option(dim) for dim in self.dimensions
-            ],
-            on_change=self.change_dimension,
-        )
-        
-        # Campos para los vectores
-        vector_a_label = ft.Text("Vector A:", color=ft.Colors.WHITE, size=16)
         self.vector_a_input = ft.TextField(
-            value="1, 2, 3",
+            label="Vector A",
             width=300,
-            bgcolor=ft.Colors.WHITE10,
+            border=ft.InputBorder.OUTLINE,
+            border_color=ft.Colors.BLUE_400,
             color=ft.Colors.WHITE,
-            border_radius=10,
-            hint_text="Ej: 1, 2, 3",
-            border=ft.border.all(1, ft.Colors.BLUE_200),
         )
         
-        vector_b_label = ft.Text("Vector B:", color=ft.Colors.WHITE, size=16)
         self.vector_b_input = ft.TextField(
-            value="4, 5, 6",
+            label="Vector B",
             width=300,
-            bgcolor=ft.Colors.WHITE10,
+            border=ft.InputBorder.OUTLINE,
+            border_color=ft.Colors.BLUE_400,
             color=ft.Colors.WHITE,
+        )
+        
+        self.operation_selector = ft.Dropdown(
+            label="Operación",
+            width=200,
+            border=ft.InputBorder.OUTLINE,
+            border_color=ft.Colors.BLUE_400,
+                    color=ft.Colors.WHITE,
+            options=[
+                ft.dropdown.Option("Suma"),
+                ft.dropdown.Option("Resta"),
+                ft.dropdown.Option("Producto Escalar"),
+                ft.dropdown.Option("Producto Vectorial"),
+                ft.dropdown.Option("Magnitud"),
+                ft.dropdown.Option("Vector Unitario"),
+                ft.dropdown.Option("Ángulo entre Vectores"),
+            ],
+            value="Suma",
+        )
+        
+        self.result_display = ft.Container(
+            width=650,
+            border=ft.border.all(1, ft.Colors.BLUE_400),
             border_radius=10,
-            hint_text="Ej: 4, 5, 6",
-            border=ft.border.all(1, ft.Colors.BLUE_200),
+            bgcolor=ft.Colors.BLACK,
+            padding=10,
+            content=ft.Text(
+                "Ingrese los vectores y seleccione una operación",
+                color=ft.Colors.WHITE60,
+                text_align=ft.TextAlign.CENTER,
+                size=16,
+            )
         )
         
-        # Botones para operaciones básicas
-        operations_row = ft.Row(
-            [
-                ft.ElevatedButton(
-                    text="A + B",
-                    on_click=lambda _: self.calculate_operation("add"),
-                    bgcolor=ft.Colors.BLUE_700,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="A - B",
-                    on_click=lambda _: self.calculate_operation("subtract"),
-                    bgcolor=ft.Colors.BLUE_700,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="A · B",
-                    tooltip="Producto Escalar",
-                    on_click=lambda _: self.calculate_operation("dot"),
-                    bgcolor=ft.Colors.BLUE_700,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="A × B",
-                    tooltip="Producto Vectorial (Solo 3D)",
-                    on_click=lambda _: self.calculate_operation("cross"),
-                    bgcolor=ft.Colors.BLUE_700,
-                    color=ft.Colors.WHITE,
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
+        self.message_display = ft.Container(
+            width=650,
+            border=ft.border.all(1, ft.Colors.RED_400),
+            border_radius=10,
+            bgcolor=ft.Colors.BLACK,
+            padding=10,
+            content=ft.Text(
+                "",
+                color=ft.Colors.RED_400,
+                text_align=ft.TextAlign.CENTER,
+                size=16,
+            )
         )
         
-        # Botones para operaciones avanzadas
-        advanced_operations_row = ft.Row(
-            [
-                ft.ElevatedButton(
-                    text="|A|",
-                    tooltip="Magnitud del vector A",
-                    on_click=lambda _: self.calculate_operation("mag_a"),
-                    bgcolor=ft.Colors.INDIGO_400,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="|B|",
-                    tooltip="Magnitud del vector B",
-                    on_click=lambda _: self.calculate_operation("mag_b"),
-                    bgcolor=ft.Colors.INDIGO_400,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="Â",
-                    tooltip="Vector unitario de A",
-                    on_click=lambda _: self.calculate_operation("unit_a"),
-                    bgcolor=ft.Colors.INDIGO_400,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="B̂",
-                    tooltip="Vector unitario de B",
-                    on_click=lambda _: self.calculate_operation("unit_b"),
-                    bgcolor=ft.Colors.INDIGO_400,
-                    color=ft.Colors.WHITE,
-                ),
-                ft.ElevatedButton(
-                    text="∠(A,B)",
-                    tooltip="Ángulo entre vectores",
-                    on_click=lambda _: self.calculate_operation("angle"),
-                    bgcolor=ft.Colors.INDIGO_400,
-                    color=ft.Colors.WHITE,
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-        )
-        
-        # Botones para valores rápidos
-        quick_values_a = ft.Row(
-            [
-                ft.Text("Vector A: ", color=ft.Colors.WHITE),
-                ft.ElevatedButton(
-                    text="i",
-                    on_click=lambda _: self.set_quick_vector("A", "i"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="j",
-                    on_click=lambda _: self.set_quick_vector("A", "j"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="k",
-                    on_click=lambda _: self.set_quick_vector("A", "k"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="Zeros",
-                    on_click=lambda _: self.set_quick_vector("A", "zeros"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="Random",
-                    on_click=lambda _: self.set_quick_vector("A", "random"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-        )
-        
-        quick_values_b = ft.Row(
-            [
-                ft.Text("Vector B: ", color=ft.Colors.WHITE),
-                ft.ElevatedButton(
-                    text="i",
-                    on_click=lambda _: self.set_quick_vector("B", "i"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="j",
-                    on_click=lambda _: self.set_quick_vector("B", "j"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="k",
-                    on_click=lambda _: self.set_quick_vector("B", "k"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="Zeros",
-                    on_click=lambda _: self.set_quick_vector("B", "zeros"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-                ft.ElevatedButton(
-                    text="Random",
-                    on_click=lambda _: self.set_quick_vector("B", "random"),
-                    bgcolor=ft.Colors.BLUE_GREY_700,
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-        )
-        
-        # Área de resultados
-        result_label = ft.Text(
-            "Resultado:",
+        self.calculate_button = ft.ElevatedButton(
+            text="Calcular",
+            on_click=self.calculate_operation,
+            bgcolor=ft.Colors.BLUE_400,
             color=ft.Colors.WHITE,
-            size=20,
-            weight=ft.FontWeight.BOLD,
         )
         
-        self.result_text = ft.Text(
-            "",
-            color=ft.Colors.WHITE,
+        self.view = ft.Column([
+            ft.Text("Operaciones con Vectores", size=32, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+            ft.Text(
+                "Realiza operaciones básicas con vectores: suma, resta, productos escalar y vectorial, magnitud, vector unitario y ángulo entre vectores.",
+                color=ft.Colors.WHITE70,
+                size=16,
+            ),
+            ft.Container(height=20),
+            ft.Row([
+                self.vector_a_input,
+                self.vector_b_input,
+            ], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Container(height=20),
+            ft.Row([
+                self.operation_selector,
+                self.calculate_button,
+            ], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Container(height=20),
+            self.result_display,
+            self.message_display,
+        ])
+    
+    def calculate_operation(self, e):
+        try:
+            operation = self.operation_selector.value
+            
+            if operation in ["Magnitud", "Vector Unitario"]:
+                vector_a = self.vector_ops.parse_vector(self.vector_a_input.value)
+                vector_b = None
+            else:
+                vector_a = self.vector_ops.parse_vector(self.vector_a_input.value)
+                vector_b = self.vector_ops.parse_vector(self.vector_b_input.value)
+            
+            result = None
+            if operation == "Suma":
+                result = self.vector_ops.add_vectors(vector_a, vector_b)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"A + B = {result}", size=20, color=ft.Colors.WHITE),
+                ])
+            elif operation == "Resta":
+                result = self.vector_ops.subtract_vectors(vector_a, vector_b)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"A - B = {result}", size=20, color=ft.Colors.WHITE),
+                ])
+            elif operation == "Producto Escalar":
+                result = self.vector_ops.dot_product(vector_a, vector_b)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"A · B = {result}", size=20, color=ft.Colors.WHITE),
+                ])
+            elif operation == "Producto Vectorial":
+                result = self.vector_ops.cross_product(vector_a, vector_b)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"A × B = {result}", size=20, color=ft.Colors.WHITE),
+                ])
+            elif operation == "Magnitud":
+                result = self.vector_ops.vector_magnitude(vector_a)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"|A| = {result}", size=20, color=ft.Colors.WHITE),
+                ])
+            elif operation == "Vector Unitario":
+                result = self.vector_ops.unit_vector(vector_a)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"û = {result}", size=20, color=ft.Colors.WHITE),
+                ])
+            elif operation == "Ángulo entre Vectores":
+                result = self.vector_ops.angle_between_vectors(vector_a, vector_b)
+                content = ft.Column([
+                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                    ft.Text(f"θ = {result:.4f} radianes", size=20, color=ft.Colors.WHITE),
+                    ft.Text(f"θ = {np.degrees(result):.4f} grados", size=20, color=ft.Colors.WHITE),
+                ])
+            
+            self.result_display.content = content
+            self.message_display.content = ft.Text("", color=ft.Colors.RED_400)
+            self.page.update()
+            
+        except Exception as e:
+            self.show_error(str(e))
+    
+    def show_error(self, message: str):
+        self.message_display.content = ft.Text(
+            message,
+            color=ft.Colors.RED_400,
+            text_align=ft.TextAlign.CENTER,
             size=16,
         )
-        
-        result_container = ft.Container(
-            content=self.result_text,
-            padding=ft.padding.all(20),
-            border_radius=10,
-            border=ft.border.all(1, ft.Colors.BLUE_400),
-            width=600,
-            height=150,
-        )
-        
-        # Layout principal
-        self.page.controls[0].controls[1].content.controls = [
-            ft.Column(
-                [
-                    # Título y selector de dimensiones
-                    ft.Container(
-                        padding=ft.padding.only(left=40, top=20, right=40, bottom=10),
-                        content=ft.Row(
-                            [title, dimension_selector],
-                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                        ),
-                    ),
-                    
-                    # Inputs de vectores
-                    ft.Container(
-                        padding=ft.padding.symmetric(horizontal=40, vertical=10),
-                        content=ft.Column(
-                            [
-                                ft.Row(
-                                    [vector_a_label, self.vector_a_input],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                                quick_values_a,
-                                ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
-                                ft.Row(
-                                    [vector_b_label, self.vector_b_input],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                                quick_values_b,
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            spacing=10,
-                        ),
-                    ),
-                    
-                    # Operaciones
-                    ft.Container(
-                        padding=ft.padding.symmetric(horizontal=40, vertical=10),
-                        content=ft.Column(
-                            [operations_row, advanced_operations_row],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            spacing=10,
-                        ),
-                    ),
-                    
-                    # Resultados
-                    ft.Container(
-                        padding=ft.padding.symmetric(horizontal=40, vertical=20),
-                        content=ft.Column(
-                            [
-                                result_label,
-                                result_container,
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        ),
-                    ),
-                ],
-                alignment=ft.MainAxisAlignment.START,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                expand=True,
-            )
-        ]
+        self.page.update()
     
     def change_dimension(self, e):
         self.current_dimension = e.control.value
@@ -357,53 +250,3 @@ class VectorView:
         else:
             # Para dimensiones mayores, usar notación [x, y, z, ...]
             return f"[{', '.join(components)}]"
-    
-    def calculate_operation(self, operation):
-        try:
-            vec_a = self.vector_ops.parse_vector(self.vector_a_input.value)
-            vec_b = self.vector_ops.parse_vector(self.vector_b_input.value)
-            
-            if operation == "add":
-                result = self.vector_ops.add_vectors(vec_a, vec_b)
-                self.result_text.value = f"A + B = {self.vector_to_str(result)}"
-            
-            elif operation == "subtract":
-                result = self.vector_ops.subtract_vectors(vec_a, vec_b)
-                self.result_text.value = f"A - B = {self.vector_to_str(result)}"
-            
-            elif operation == "dot":
-                result = self.vector_ops.dot_product(vec_a, vec_b)
-                self.result_text.value = f"A · B = {result}"
-            
-            elif operation == "cross":
-                if self.current_dimension != "3D":
-                    self.result_text.value = "El producto vectorial solo está definido para vectores 3D"
-                else:
-                    result = self.vector_ops.cross_product(vec_a, vec_b)
-                    self.result_text.value = f"A × B = {self.vector_to_str(result)}"
-            
-            elif operation == "mag_a":
-                result = self.vector_ops.vector_magnitude(vec_a)
-                self.result_text.value = f"|A| = {result:.4f}"
-            
-            elif operation == "mag_b":
-                result = self.vector_ops.vector_magnitude(vec_b)
-                self.result_text.value = f"|B| = {result:.4f}"
-            
-            elif operation == "unit_a":
-                result = self.vector_ops.unit_vector(vec_a)
-                self.result_text.value = f"Â = {self.vector_to_str(result)}"
-            
-            elif operation == "unit_b":
-                result = self.vector_ops.unit_vector(vec_b)
-                self.result_text.value = f"B̂ = {self.vector_to_str(result)}"
-            
-            elif operation == "angle":
-                result_rad = self.vector_ops.angle_between_vectors(vec_a, vec_b)
-                result_deg = result_rad * 180 / math.pi
-                self.result_text.value = f"Ángulo entre A y B: {result_rad:.4f} radianes ({result_deg:.2f}°)"
-        
-        except Exception as e:
-            self.result_text.value = f"Error: {str(e)}"
-            
-        self.page.update() 

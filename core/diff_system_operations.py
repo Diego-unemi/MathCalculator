@@ -14,10 +14,8 @@ class DiffSystemOperations:
     
     def _preprocesar_ecuacion(self, eq: str) -> str:
         try:
-            # Eliminar espacios innecesarios
             eq = eq.strip()
             
-            # Separar el lado izquierdo y derecho de la ecuación
             if '=' not in eq:
                 raise ValueError("La ecuación debe contener un signo igual (=)")
             
@@ -25,8 +23,7 @@ class DiffSystemOperations:
             lhs = lhs.strip()
             rhs = rhs.strip()
             
-            # Procesar el lado izquierdo (derivada)
-            lhs = lhs.lower()  # Convertir a minúsculas para manejar diferentes formatos
+            lhs = lhs.lower()
             if lhs in ['dx/dt', 'dx/d(t)', 'd(x)/dt', 'd(x)/d(t)']:
                 lhs = 'Derivative(x(t), t)'
             elif lhs in ['dy/dt', 'dy/d(t)', 'd(y)/dt', 'd(y)/d(t)']:
@@ -34,43 +31,15 @@ class DiffSystemOperations:
             else:
                 raise ValueError("El lado izquierdo debe ser dx/dt o dy/dt")
             
-            # Procesar el lado derecho
-            # Reemplazar comas por puntos en los números decimales
             rhs = re.sub(r'(\d),(\d)', r'\1.\2', rhs)
-            
-            # Agregar * entre número y variable (ej: 0.3x -> 0.3*x)
             rhs = re.sub(r'(\d*\.?\d+)([a-zA-Z])', r'\1*\2', rhs)
-            
-            # Agregar * entre variable y variable (ej: x y -> x*y)
             rhs = re.sub(r'([a-zA-Z])\s+([a-zA-Z])', r'\1*\2', rhs)
-            
-            # Agregar * entre cierre de paréntesis y variable (ej: )x -> )*x)
             rhs = re.sub(r'(\))(\w)', r'\1*\2', rhs)
-            
-            # Agregar * entre número y paréntesis (ej: 2(x) -> 2*(x))
             rhs = re.sub(r'(\d*\.?\d+)(\()', r'\1*\2', rhs)
             
-            # Agregar * entre variable y paréntesis (ej: x(y) -> x*(y))
-            rhs = re.sub(r'([a-zA-Z])(\()', r'\1*\2', rhs)
-            
-            # Manejar potencias
-            rhs = re.sub(r'(\w+)\s*\^\s*(\d+)', r'\1**\2', rhs)
-            
-            # Eliminar espacios innecesarios
-            rhs = rhs.replace(' ', '')
-            
-            # Asegurar que las variables x e y estén en función de t
-            # Solo reemplazar x e y que no estén ya en función de t
-            rhs = re.sub(r'\bx\b(?!\()', 'x(t)', rhs)
-            rhs = re.sub(r'\by\b(?!\()', 'y(t)', rhs)
-            
-            # Construir la ecuación final en la forma dx/dt = f(x,y)
-            eq = f"{lhs}-({rhs})"
-            
-            return eq
+            return f"{lhs} = {rhs}"
         except Exception as e:
-            logger.error(f"Error en preprocesamiento de ecuación: {str(e)}")
-            raise ValueError(f"Error en formato de ecuación: {str(e)}")
+            raise ValueError(f"Error al preprocesar la ecuación: {str(e)}")
     
     def preparar_sistema(self, sistema_str: str) -> Tuple[sp.Matrix, sp.Matrix]:
         """Prepara el sistema de ecuaciones diferenciales en formato matricial."""
@@ -252,30 +221,25 @@ class DiffSystemOperations:
             vectores_propios = self.calcular_vectores_propios(A)
             lambda1_str = valores_propios[0].split('=')[1].strip()
             lambda2_str = valores_propios[1].split('=')[1].strip()
-            # Convertir a números complejos si es necesario
+            
             def parse_lambda(lstr):
                 lstr = lstr.replace(' ', '')
                 if 'i' in lstr:
                     lstr = lstr.replace('i','j')
-                    # Reemplazar +j o -j por +1j o -1j
                     lstr = re.sub(r'([+-])j', r'\g<1>1j', lstr)
                     lstr = re.sub(r'^j', '1j', lstr)
                     lstr = re.sub(r'^-j', '-1j', lstr)
-                    # Usar regex para extraer partes real e imaginaria
                     match = re.match(r'^([+-]?\d*\.?\d+)([+-]\d*\.?\d+)j$', lstr)
                     if match:
                         real = float(match.group(1))
                         imag = float(match.group(2))
                         return complex(real, imag)
-                    # Caso puramente imaginario
                     match_imag = re.match(r'^([+-]?\d*\.?\d+)j$', lstr)
                     if match_imag:
                         return complex(0, float(match_imag.group(1)))
-                    # Caso puramente real
                     match_real = re.match(r'^([+-]?\d*\.?\d+)$', lstr)
                     if match_real:
                         return float(match_real.group(1))
-                    # Último intento
                     try:
                         return complex(lstr)
                     except Exception as e:
@@ -285,7 +249,6 @@ class DiffSystemOperations:
                     return float(lstr)
             lambda1 = parse_lambda(lambda1_str)
             lambda2 = parse_lambda(lambda2_str)
-            # Obtener y normalizar los vectores propios (ahora como números)
             v1 = vectores_propios[0][2][0]
             v2 = vectores_propios[1][2][0]
             v1_arr = np.array([complex(x) for x in v1])
@@ -321,9 +284,8 @@ class DiffSystemOperations:
                 raise ValueError(f"Error al evaluar la solución: {str(eval_err)}")
             if x_valores is None or y_valores is None:
                 raise ValueError("La solución no pudo ser evaluada numéricamente.")
-            # Formatear la información de valores y vectores propios
+            
             info_valores_propios = "\n".join(valores_propios)
-            # Formatear los vectores propios para mostrar
             def format_vector(v):
                 return f"[{v[0]}, {v[1]}]"
             info_vectores_propios = "\n".join([
@@ -346,10 +308,8 @@ class DiffSystemOperations:
     def analizar_estabilidad(self, valores_propios: List[sp.Expr]) -> str:
         """Analiza la estabilidad del sistema basado en los valores propios."""
         try:
-            # Convertir valores propios a números complejos
             vals = [complex(str(v)) for v in valores_propios]
             
-            # Analizar estabilidad
             if all(v.real < 0 for v in vals):
                 return "El sistema es asintóticamente estable (sumidero)"
             elif all(v.real > 0 for v in vals):
