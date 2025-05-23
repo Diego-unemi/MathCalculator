@@ -18,11 +18,37 @@ class MainView:
         self.page = page
         self.current_view = None
         
+        # Inicializar todas las vistas
         self.derivative_view = DerivativeView(page)
         self.vector_view = VectorView(page)
         self.matrix_view = MatrixView(page)
         self.diff_system_view = DiffSystemView(page)
         self.monte_carlo_view = MonteCarloView(page)
+        self.equation_view = EquationView(page)
+        self.integral_view = IntegralView(page)
+        self.graph2d_view = Graph2DView(page)
+        self.graph3d_view = Graph3DView(page)
+        self.diff_equation_view = DiffEquationView(page)
+        self.population_models_view = PopulationModelsView(page)
+        self.random_generator_view = RandomGeneratorView(page)
+        self.poisson_view = PoissonView(page)
+        
+        # Diccionario de vistas
+        self.views = {
+            "matrices": self.matrix_view,
+            "vectores": self.vector_view,
+            "ecuaciones": self.equation_view,
+            "integrales": self.integral_view,
+            "derivadas": self.derivative_view,
+            "grafica_2d": self.graph2d_view,
+            "grafica_3d": self.graph3d_view,
+            "ecuaciones_diferenciales": self.diff_equation_view,
+            "sistemas_diferenciales": self.diff_system_view,
+            "modelos_poblacionales": self.population_models_view,
+            "generador_aleatorio": self.random_generator_view,
+            "monte_carlo": self.monte_carlo_view,
+            "poisson": self.poisson_view
+        }
         
         self.navigation_rail = ft.NavigationRail(
             selected_index=0,
@@ -32,23 +58,23 @@ class MainView:
             group_alignment=-0.9,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.icons.CALCULATE,
+                    icon=ft.Icon(name="calculate"),
                     label="Derivadas",
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.ARROW_FORWARD,
+                    icon=ft.Icon(name="arrow_forward"),
                     label="Vectores",
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.GRID_4X4,
+                    icon=ft.Icon(name="grid_4x4"),
                     label="Matrices",
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.TRENDING_UP,
+                    icon=ft.Icon(name="trending_up"),
                     label="Sistemas Diferenciales",
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.CASINO,
+                    icon=ft.Icon(name="casino"),
                     label="Monte Carlo",
                 ),
             ],
