@@ -12,98 +12,6 @@ class MatrixView:
         self.matrix_b = np.zeros((self.matrix_size_b, self.matrix_size_b))
         self.matrix_ops = MatrixOperations()
         self.result_matrix = None
-        
-        self.matrix_a_input = ft.TextField(
-            label="Matriz A",
-            width=300,
-            border=ft.InputBorder.OUTLINE,
-            border_color=ft.Colors.BLUE_400,
-            color=ft.Colors.WHITE,
-        )
-        
-        self.matrix_b_input = ft.TextField(
-            label="Matriz B",
-            width=300,
-            border=ft.InputBorder.OUTLINE,
-            border_color=ft.Colors.BLUE_400,
-            color=ft.Colors.WHITE,
-        )
-        
-        self.operation_selector = ft.Dropdown(
-            label="Operación",
-            width=200,
-            border=ft.InputBorder.OUTLINE,
-            border_color=ft.Colors.BLUE_400,
-            color=ft.Colors.WHITE,
-            options=[
-                ft.dropdown.Option("Suma"),
-                ft.dropdown.Option("Resta"),
-                ft.dropdown.Option("Multiplicación"),
-                ft.dropdown.Option("Determinante"),
-                ft.dropdown.Option("Inversa"),
-                ft.dropdown.Option("Transpuesta"),
-                ft.dropdown.Option("Rango"),
-                ft.dropdown.Option("Valores Propios"),
-            ],
-            value="Suma",
-        )
-        
-        self.result_display = ft.Container(
-            width=650,
-            border=ft.border.all(1, ft.Colors.BLUE_400),
-            border_radius=10,
-            bgcolor=ft.Colors.BLACK,
-            padding=10,
-            content=ft.Text(
-                "Ingrese las matrices y seleccione una operación",
-                color=ft.Colors.WHITE60,
-                text_align=ft.TextAlign.CENTER,
-                size=16,
-            )
-        )
-        
-        self.message_display = ft.Container(
-            width=650,
-            border=ft.border.all(1, ft.Colors.RED_400),
-            border_radius=10,
-            bgcolor=ft.Colors.BLACK,
-            padding=10,
-            content=ft.Text(
-                "",
-                color=ft.Colors.RED_400,
-                text_align=ft.TextAlign.CENTER,
-                size=16,
-            )
-        )
-        
-        self.calculate_button = ft.ElevatedButton(
-            text="Calcular",
-            on_click=self.calculate_operation,
-            bgcolor=ft.Colors.BLUE_400,
-            color=ft.Colors.WHITE,
-        )
-        
-        self.view = ft.Column([
-            ft.Text("Operaciones con Matrices", size=32, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-            ft.Text(
-                "Realiza operaciones básicas con matrices: suma, resta, multiplicación, determinante, inversa, transpuesta, rango y valores propios.",
-                color=ft.Colors.WHITE70,
-                size=16,
-            ),
-            ft.Container(height=20),
-            ft.Row([
-                self.matrix_a_input,
-                self.matrix_b_input,
-            ], alignment=ft.MainAxisAlignment.CENTER),
-            ft.Container(height=20),
-            ft.Row([
-                self.operation_selector,
-                self.calculate_button,
-            ], alignment=ft.MainAxisAlignment.CENTER),
-            ft.Container(height=20),
-            self.result_display,
-            self.message_display,
-        ])
 
     def fraction_to_str(self, value):
         """Convierte un valor (entero, float o Fraction) a string para mostrar"""
@@ -195,81 +103,46 @@ class MatrixView:
         
         self.page.update()
 
-    def calculate_operation(self, e):
+    def calculate(self, operation):
+        # Obtener valores de matrices
+        matrix_a = self.get_matrix_values(self.matrix_a_inputs)
+        matrix_b = self.get_matrix_values(self.matrix_b_inputs)
+        
         try:
-            operation = self.operation_selector.value
-            
-            if operation in ["Determinante", "Inversa", "Transpuesta", "Rango", "Valores Propios"]:
-                matrix_a = self.matrix_ops.parse_matrix(self.matrix_a_input.value)
-                matrix_b = None
-            else:
-                matrix_a = self.matrix_ops.parse_matrix(self.matrix_a_input.value)
-                matrix_b = self.matrix_ops.parse_matrix(self.matrix_b_input.value)
-            
-            result = None
-            if operation == "Suma":
+            if operation == "+":
                 result = self.matrix_ops.add_matrices(matrix_a, matrix_b)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"A + B = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Resta":
+            elif operation == "-":
                 result = self.matrix_ops.subtract_matrices(matrix_a, matrix_b)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"A - B = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Multiplicación":
+            elif operation == "×":
                 result = self.matrix_ops.multiply_matrices(matrix_a, matrix_b)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"A × B = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Determinante":
-                result = self.matrix_ops.determinant(matrix_a)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"det(A) = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Inversa":
-                result = self.matrix_ops.inverse(matrix_a)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"A⁻¹ = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Transpuesta":
-                result = self.matrix_ops.transpose(matrix_a)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"Aᵀ = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Rango":
-                result = self.matrix_ops.rank(matrix_a)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"rango(A) = {result}", size=20, color=ft.Colors.WHITE),
-                ])
-            elif operation == "Valores Propios":
-                result = self.matrix_ops.eigenvalues(matrix_a)
-                content = ft.Column([
-                    ft.Text("Resultado:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                    ft.Text(f"λ = {result}", size=20, color=ft.Colors.WHITE),
-                ])
+            elif operation == "det_a":
+                det = self.matrix_ops.calculate_determinant(matrix_a)
+                if det is not None:
+                    self.result_text.value = f"Determinante de A = {self.fraction_to_str(det)}"
+                else:
+                    self.result_text.value = "Error al calcular el determinante"
+                self.page.update()
+                return
+            elif operation == "det_b":
+                det = self.matrix_ops.calculate_determinant(matrix_b)
+                if det is not None:
+                    self.result_text.value = f"Determinante de B = {self.fraction_to_str(det)}"
+                else:
+                    self.result_text.value = "Error al calcular el determinante"
+                self.page.update()
+                return
+            elif operation == "inv_a":
+                result = self.matrix_ops.calculate_inverse(matrix_a)
+            elif operation == "inv_b":
+                result = self.matrix_ops.calculate_inverse(matrix_b)
             
-            self.result_display.content = content
-            self.message_display.content = ft.Text("", color=ft.Colors.RED_400)
-            self.page.update()
-            
+            # Mostrar resultados
+            self.result_matrix = self.create_matrix_inputs(len(result), result)
+            self.result_container.content = self.result_matrix
+            self.result_text.value = ""
         except Exception as e:
-            self.show_error(str(e))
-    
-    def show_error(self, message: str):
-        self.message_display.content = ft.Text(
-            message,
-            color=ft.Colors.RED_400,
-            text_align=ft.TextAlign.CENTER,
-            size=16,
-        )
+            self.result_text.value = f"Error: {str(e)}"
+        
         self.page.update()
 
     def show(self):

@@ -38,6 +38,7 @@ class VectorOperations:
     def cross_product(self, A, B):
         """Calcula el producto vectorial de dos vectores"""
         try:
+            # Verificar que los vectores sean 3D (el producto vectorial solo está definido en R³)
             if len(A) != 3 or len(B) != 3:
                 raise ValueError("Los vectores deben ser tridimensionales para el producto vectorial")
             return np.cross(A, B)

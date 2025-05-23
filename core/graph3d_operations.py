@@ -11,20 +11,16 @@ class Graph3DOperations:
     def limpiar_expr(self, func_str):
         """Limpia la expresión para hacerla compatible con evaluación numérica"""
         expr = func_str.replace("^", "**")
-        # Lista de funciones trigonométricas y otras funciones matemáticas
         funciones = ['sin', 'cos', 'tan', 'log', 'exp', 'sqrt']
         
-        # Primero reemplazamos las funciones trigonométricas con un marcador temporal
         for func in funciones:
             expr = expr.replace(func, f"__{func}__")
         
-        # Aplicamos las reglas de multiplicación
-        expr = re.sub(r"(\d)([a-zA-Z(])", r"\1*\2", expr)         # 2x → 2*x, 3sin(x) → 3*sin(x)
-        expr = re.sub(r"([a-zA-Z\)])(\()", r"\1*(", expr)         # x(y+1) → x*(y+1)
-        expr = re.sub(r"(\))([a-zA-Z\(])", r"\1*\2", expr)        # (x+1)sin(x) → (x+1)*sin(x)
-        expr = re.sub(r"([a-zA-Z])(\d)", r"\1*\2", expr)          # x2 → x*2
+        expr = re.sub(r"(\d)([a-zA-Z(])", r"\1*\2", expr)
+        expr = re.sub(r"([a-zA-Z\)])(\()", r"\1*(", expr)
+        expr = re.sub(r"(\))([a-zA-Z\(])", r"\1*\2", expr)
+        expr = re.sub(r"([a-zA-Z])(\d)", r"\1*\2", expr)
         
-        # Restauramos las funciones trigonométricas
         for func in funciones:
             expr = expr.replace(f"__{func}__", f"np.{func}")
         

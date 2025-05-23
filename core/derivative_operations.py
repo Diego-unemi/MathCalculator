@@ -9,7 +9,9 @@ class DerivativeOperations:
     
     def parse_function(self, func_str):
         try:
+            # Reemplazar ^ por ** para la potencia
             func_str = func_str.replace('^', '**')
+            # Reemplazar funciones comunes con sus equivalentes en sympy
             for old, new in [
                 ('sin', 'sp.sin'),
                 ('cos', 'sp.cos'),
@@ -26,6 +28,7 @@ class DerivativeOperations:
             ]:
                 func_str = func_str.replace(old, new)
             
+            # Convertir la expresión a una expresión sympy
             expr = eval(func_str, {"sp": sp, "Symbol": sp.Symbol}, self.symbols)
             return expr
         except Exception as e:

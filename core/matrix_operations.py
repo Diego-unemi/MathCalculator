@@ -11,10 +11,12 @@ class MatrixOperations:
 
     def calculate_inverse(self, matrix):
         try:
+            # Verificamos si la matriz es singular
             det = np.linalg.det(matrix)
             if abs(det) < 1e-10:
                 raise ValueError("La matriz es singular, no tiene inversa.")
                 
+            # Calculamos la inversa
             inv = np.linalg.inv(matrix)
             return self.format_matrix(inv)
         except Exception as e:
@@ -43,14 +45,18 @@ class MatrixOperations:
 
     def decimal_to_fraction(self, decimal, max_denominator=100):
         try:
+            # Si el número es muy cercano a un entero, lo devolvemos como entero
             if abs(decimal - round(decimal)) < 1e-10:
                 return round(decimal)
             
+            # Convertimos a fracción
             frac = Fraction(decimal).limit_denominator(max_denominator)
             
+            # Si el denominador es 1, devolvemos solo el numerador
             if frac.denominator == 1:
                 return frac.numerator
             
+            # Si el numerador es negativo, movemos el signo al numerador
             if frac.denominator < 0:
                 frac = Fraction(-frac.numerator, -frac.denominator)
             

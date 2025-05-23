@@ -414,55 +414,26 @@ class DiffEquationView:
         self.page.update()
     
     def solve_equation(self, e):
-        # Limpiar contenedores y restablecer su estado inicial
         self.message_display.content = ft.Row(
-            [
-                ft.Icon(name="hourglass_empty", color=ft.Colors.BLUE_400, size=20),
-                ft.Text(
-                    "Resolviendo ecuación...",
-                    color=ft.Colors.BLUE_400,
-                    size=14,
-                    weight=ft.FontWeight.BOLD
-                )
-            ],
-            alignment=ft.MainAxisAlignment.START
+            [ft.Text("Procesando...", color=ft.colors.WHITE)],
+            alignment=ft.MainAxisAlignment.CENTER
         )
-        
-        self.results_table.rows = []
-        self.page.update()  # Actualizar inmediatamente para mostrar el mensaje de "Resolviendo..."
+        self.page.update()
         
         try:
-            # Obtener valores de los campos
             equation = self.equation_input.value
-            func_name = self.dependent_var.value
-            indep_var = self.independent_var.value
-            
             if not equation:
-                self.show_message("Por favor, ingrese una ecuación diferencial.")
+                self.show_message("Por favor ingrese una ecuación.", is_error=True)
                 return
             
-            # Obtener condiciones iniciales
-            try:
-                x0 = float(self.x0_input.value) if self.x0_input.value else 0.0
-                y0 = float(self.y0_input.value) if self.y0_input.value else 1.0
-                t_total = float(self.t_total_input.value) if self.t_total_input.value else 5.0
-                h = float(self.h_input.value) if self.h_input.value else 0.1
-            except ValueError:
-                self.show_message("Los valores numéricos no son válidos.")
-                return
+            conditions = {}
+            if self.initial_condition.value:
+                conditions["x(0)"] = float(self.initial_condition.value)
             
-            # Crear diccionario de condiciones iniciales
-            conditions = {
-                f"{indep_var}(0)": x0,
-                f"{func_name}(0)": y0
-            }
+            t_total = float(self.t_total.value)
+            h = float(self.step_size.value)
             
-            # Seleccionar método de resolución
-            method = self.method_selector.value
-            
-            # Verificar si se quiere comparar métodos
             if self.compare_methods.value:
-                # Obtener soluciones para todos los métodos
                 try:
                     t_analitico, y_analitico, sol_analitico = self.diff_eq_ops.resolver_analitico(
                         equation, conditions, t_total, h, func_name, indep_var
@@ -498,16 +469,9 @@ class DiffEquationView:
                 except Exception as ex:
                     t_min_cuad, y_min_cuad = None, None
                 
-                try:
-                    t_rk, y_rk, _ = self.diff_eq_ops.resolver_runge_kutta(
-                        equation, conditions, t_total, h
-                    )
-                except Exception as ex:
-                    t_rk, y_rk = None, None
-                
                 # Verificar si se obtuvo al menos una solución
                 if (t_analitico is None and t_euler is None and t_euler_heun is None and 
-                    t_taylor is None and t_min_cuad is None and t_rk is None):
+                    t_taylor is None and t_min_cuad is None):
                     self.show_message("No se pudo resolver la ecuación con ningún método.")
                     return
                 
@@ -523,16 +487,12 @@ class DiffEquationView:
                     solutions.append((t_taylor, y_taylor, "Taylor (Orden 2)"))
                 if t_min_cuad is not None and y_min_cuad is not None:
                     solutions.append((t_min_cuad, y_min_cuad, "Mínimos Cuadrados"))
-                if t_rk is not None and y_rk is not None:
-                    solutions.append((t_rk, y_rk, "Runge-Kutta"))
                 
                 self.plot_comparison(solutions, equation)
                 
                 # Usar los resultados disponibles para la tabla
                 if t_analitico is not None and y_analitico is not None:
                     self.generate_results_table(t_analitico, y_analitico)
-                elif t_rk is not None and y_rk is not None:
-                    self.generate_results_table(t_rk, y_rk)
                 elif t_euler_heun is not None and y_euler_heun is not None:
                     self.generate_results_table(t_euler_heun, y_euler_heun)
                 elif t_taylor is not None and y_taylor is not None:
@@ -544,27 +504,27 @@ class DiffEquationView:
                 
             else:
                 # Resolver con el método seleccionado
-                if method == "Metodo Analitico":
+                if self.method_selector.value == "Metodo Analitico":
                     t, y, solution_latex = self.diff_eq_ops.resolver_analitico(
                         equation, conditions, t_total, h, func_name, indep_var
                     )
-                elif method == "Euler":
+                elif self.method_selector.value == "Euler":
                     t, y, solution_latex = self.diff_eq_ops.resolver_euler(
                         equation, conditions, t_total, h
                     )
-                elif method == "Euler (Heun)":
+                elif self.method_selector.value == "Euler (Heun)":
                     t, y, solution_latex = self.diff_eq_ops.resolver_euler_heun(
                         equation, conditions, t_total, h
                     )
-                elif method == "Taylor (Orden 2)":
+                elif self.method_selector.value == "Taylor (Orden 2)":
                     t, y, solution_latex = self.diff_eq_ops.resolver_taylor_orden2(
                         equation, conditions, t_total, h
                     )
-                elif method == "Mínimos Cuadrados":
+                elif self.method_selector.value == "Mínimos Cuadrados":
                     t, y, solution_latex = self.diff_eq_ops.resolver_minimos_cuadrados(
                         equation, conditions, t_total, h
                     )
-                elif method == "Runge-Kutta":
+                elif self.method_selector.value == "Runge-Kutta":
                     t, y, solution_latex = self.diff_eq_ops.resolver_runge_kutta(
                         equation, conditions, t_total, h
                     )
@@ -575,7 +535,7 @@ class DiffEquationView:
                     return
                 
                 # Graficar la solución
-                self.plot_solution(t, y, equation, method)
+                self.plot_solution(t, y, equation, self.method_selector.value)
                 
                 # Generar tabla de resultados
                 self.generate_results_table(t, y)
