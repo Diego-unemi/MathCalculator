@@ -41,16 +41,16 @@ class DiffSystemOperations:
             # Agregar * entre número y variable (ej: 0.3x -> 0.3*x)
             rhs = re.sub(r'(\d*\.?\d+)([a-zA-Z])', r'\1*\2', rhs)
             
-            # Agregar * entre variable y variable
+            # Agregar * entre variable y variable (ej: x y -> x*y)
             rhs = re.sub(r'([a-zA-Z])\s+([a-zA-Z])', r'\1*\2', rhs)
             
-            # Agregar * entre cierre de paréntesis y variable
+            # Agregar * entre cierre de paréntesis y variable (ej: )x -> )*x)
             rhs = re.sub(r'(\))(\w)', r'\1*\2', rhs)
             
-            # Agregar * entre número y paréntesis
+            # Agregar * entre número y paréntesis (ej: 2(x) -> 2*(x))
             rhs = re.sub(r'(\d*\.?\d+)(\()', r'\1*\2', rhs)
             
-            # Agregar * entre variable y paréntesis
+            # Agregar * entre variable y paréntesis (ej: x(y) -> x*(y))
             rhs = re.sub(r'([a-zA-Z])(\()', r'\1*\2', rhs)
             
             # Manejar potencias
@@ -60,10 +60,11 @@ class DiffSystemOperations:
             rhs = rhs.replace(' ', '')
             
             # Asegurar que las variables x e y estén en función de t
+            # Solo reemplazar x e y que no estén ya en función de t
             rhs = re.sub(r'\bx\b(?!\()', 'x(t)', rhs)
             rhs = re.sub(r'\by\b(?!\()', 'y(t)', rhs)
             
-            # Construir la ecuación final
+            # Construir la ecuación final en la forma dx/dt = f(x,y)
             eq = f"{lhs}-({rhs})"
             
             return eq
@@ -72,7 +73,6 @@ class DiffSystemOperations:
             raise ValueError(f"Error en formato de ecuación: {str(e)}")
     
     def preparar_sistema(self, sistema_str: str) -> Tuple[sp.Matrix, sp.Matrix]:
-        """Prepara el sistema de ecuaciones diferenciales en formato matricial."""
         try:
             # Convertir el string del sistema en ecuaciones
             ecuaciones = sistema_str.strip().split('\n')
@@ -109,15 +109,7 @@ class DiffSystemOperations:
             raise ValueError(f"Error al preparar el sistema: {str(e)}")
     
     def _convertir_a_complejo(self, expr):
-        """
-        Convierte una expresión simbólica de SymPy a un número complejo de Python.
         
-        Args:
-            expr: Expresión simbólica de SymPy
-            
-        Returns:
-            Número complejo de Python
-        """
         try:
             # Evaluar la expresión simbólica numéricamente
             expr_eval = sp.N(expr)
@@ -145,15 +137,6 @@ class DiffSystemOperations:
             raise ValueError(f"No se pudo convertir la expresión a número complejo: {expr}")
 
     def calcular_valores_propios(self, A):
-        """
-        Calcula los valores propios de la matriz A.
-        
-        Args:
-            A: Matriz del sistema
-            
-        Returns:
-            Lista de valores propios ordenados por parte real descendente
-        """
         try:
             # Obtener valores propios
             valores_propios = A.eigenvals()
@@ -198,7 +181,6 @@ class DiffSystemOperations:
             raise ValueError(f"Error al calcular valores propios: {str(e)}")
     
     def calcular_vectores_propios(self, A: sp.Matrix) -> List[Tuple[str, int, List[List[complex]]]]:
-        """Calcula los vectores propios de la matriz del sistema y los devuelve como listas de números (no strings)."""
         try:
             eigenvects = A.eigenvects()
             vectores_propios_formateados = []
@@ -242,7 +224,6 @@ class DiffSystemOperations:
             raise ValueError(f"Error al calcular vectores propios: {str(e)}")
     
     def resolver_sistema(self, sistema_str: str, condiciones_iniciales: Dict[str, float], t_total: float, h: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Dict]:
-        """Resuelve el sistema de ecuaciones diferenciales y retorna la solución y análisis."""
         try:
             if t_total <= 0 or h <= 0:
                 raise ValueError("El tiempo total y el paso deben ser positivos")
@@ -343,7 +324,6 @@ class DiffSystemOperations:
             raise ValueError(f"Error al resolver el sistema: {str(e)}")
     
     def analizar_estabilidad(self, valores_propios: List[sp.Expr]) -> str:
-        """Analiza la estabilidad del sistema basado en los valores propios."""
         try:
             # Convertir valores propios a números complejos
             vals = [complex(str(v)) for v in valores_propios]

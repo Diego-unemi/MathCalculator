@@ -207,11 +207,13 @@ class Graph3DView:
     def plot_function(self, e):
         """Grafica la función 3D ingresada por el usuario utilizando matplotlib"""
         try:
+            # Validar campos
             func_str = self.function_input.value
             if not func_str:
                 self.show_error("Por favor ingrese una función.")
                 return
             
+            # Obtener rango de x e y
             try:
                 x_min = float(self.x_min_input.value)
                 x_max = float(self.x_max_input.value)
@@ -229,6 +231,7 @@ class Graph3DView:
                 self.show_error("Los valores de rango deben ser números.")
                 return
             
+            # Crear mensaje de espera
             self.graph_container.content = ft.Text(
                 "Generando gráfica...",
                 color=ft.Colors.WHITE,
@@ -236,8 +239,13 @@ class Graph3DView:
             )
             self.page.update()
             
+            # Generar datos para la gráfica
             plot_type = self.plot_type.value
+            
+            # Puntos para superficie 3D (menos para mejor rendimiento)
             points_3d = 30
+            
+            # Más puntos para mapa de contorno
             points_contour = 100
             
             if plot_type == "Superficie 3D" or plot_type == "Ambos":
@@ -249,10 +257,13 @@ class Graph3DView:
                     func_str, x_min, x_max, y_min, y_max, points=points_contour
                 )
             
+            # Crear la figura de matplotlib con backend Agg
             if plot_type == "Ambos":
+                # Crear figura con dos subplots
                 fig = plt.figure(figsize=(10, 5), dpi=100)
                 plt.style.use('dark_background')
                 
+                # Superficie 3D
                 ax1 = fig.add_subplot(121, projection='3d')
                 surf = ax1.plot_surface(
                     plot_data['X'], plot_data['Y'], plot_data['Z'],
@@ -263,6 +274,7 @@ class Graph3DView:
                 ax1.set_zlabel('Z')
                 ax1.set_title(f"Superficie: z = {plot_data['latex']}")
                 
+                # Mapa de contorno
                 ax2 = fig.add_subplot(122)
                 contour = ax2.contourf(
                     plot_data['X'], plot_data['Y'], plot_data['Z'],

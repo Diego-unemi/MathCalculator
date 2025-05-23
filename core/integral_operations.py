@@ -8,7 +8,6 @@ class IntegralOperations:
         self.symbols = {'x': self.x}
     
     def parse_function(self, func_str):
-        """Convierte una cadena de texto en una expresión simbólica"""
         try:
             # Reemplazar X por x para evitar errores de mayúsculas
             func_str = func_str.replace('X', 'x')
@@ -38,14 +37,6 @@ class IntegralOperations:
             raise ValueError(f"Error al parsear la función: {str(e)}")
     
     def get_numpy_function(self, func_str):
-        """Convierte una función a formato numpy para graficar
-        
-        Args:
-            func_str: String con la función a convertir
-            
-        Returns:
-            Función lambda que puede ser evaluada con numpy arrays
-        """
         try:
             expr = self.parse_function(func_str)
             # Usar lambdify con módulos específicos para mejor compatibilidad
@@ -54,14 +45,6 @@ class IntegralOperations:
             raise ValueError(f"Error al convertir la función a formato numpy: {str(e)}")
     
     def compute_indefinite_integral(self, func_str):
-        """Calcula la integral indefinida de una función
-        
-        Args:
-            func_str: String con la función a integrar, ej: "x^2 + 2*x + 1"
-            
-        Returns:
-            Expresión simbólica de la integral indefinida
-        """
         try:
             expr = self.parse_function(func_str)
             integral = sp.integrate(expr, self.x)
@@ -73,16 +56,6 @@ class IntegralOperations:
             raise ValueError(f"Error al calcular la integral indefinida: {str(e)}")
     
     def compute_definite_integral(self, func_str, lower_bound, upper_bound):
-        """Calcula la integral definida de una función
-        
-        Args:
-            func_str: String con la función a integrar, ej: "x^2 + 2*x + 1"
-            lower_bound: Límite inferior de integración
-            upper_bound: Límite superior de integración
-            
-        Returns:
-            Valor de la integral definida
-        """
         try:
             expr = self.parse_function(func_str)
             

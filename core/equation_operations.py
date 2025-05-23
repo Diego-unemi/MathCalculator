@@ -7,7 +7,6 @@ class EquationOperations:
         self.y = sp.symbols("y")
         
     def solve_linear_equation(self, a, b):
-        """Resuelve una ecuación lineal de la forma ax + b = 0"""
         try:
             if a == 0:
                 if b == 0:
@@ -22,7 +21,6 @@ class EquationOperations:
             raise ValueError(f"Error al resolver la ecuación: {str(e)}")
     
     def solve_quadratic_equation(self, a, b, c):
-        """Resuelve una ecuación cuadrática de la forma ax^2 + bx + c = 0"""
         try:
             if a == 0:
                 return self.solve_linear_equation(b, c)
@@ -49,10 +47,6 @@ class EquationOperations:
             raise ValueError(f"Error al resolver la ecuación: {str(e)}")
     
     def solve_system_2x2(self, a1, b1, c1, a2, b2, c2):
-        """Resuelve un sistema de ecuaciones 2x2
-        a1*x + b1*y = c1
-        a2*x + b2*y = c2
-        """
         try:
             eq1 = sp.Eq(a1 * self.x + b1 * self.y, c1)
             eq2 = sp.Eq(a2 * self.x + b2 * self.y, c2)
@@ -70,7 +64,6 @@ class EquationOperations:
             raise ValueError(f"Error al resolver el sistema: {str(e)}")
     
     def get_equation_string(self, eq_type, *coeffs):
-        """Devuelve la representación en texto de una ecuación"""
         try:
             if eq_type == "Lineal":
                 a, b = coeffs

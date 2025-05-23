@@ -17,7 +17,7 @@ def main(page: ft.Page):
         page.window_resizable = True
         page.title = "MathCalculator"
         page.theme_mode = ft.ThemeMode.DARK
-        page.bgcolor = "#000000"  # Color negro en formato hexadecimal
+        page.bgcolor = "#000000"  
         
         # Habilitar scroll para el contenido principal, pero no para toda la aplicación
         page.scroll = None        
